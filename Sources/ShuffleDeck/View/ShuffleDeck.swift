@@ -5,6 +5,26 @@ import UtilsForTest
 import ViewInspector
 #endif
 
+
+
+public struct ShuffleDeckConfig: Equatable, Hashable {
+    public var minDragDistance: CGFloat? = nil
+    public var explicitHeight: CGFloat? = nil
+    public var explicitWidth: CGFloat? = nil
+    
+    
+    
+    public init(minDragDistance: CGFloat? = nil,
+                explicitHeight: CGFloat? = nil,
+                explicitWidth: CGFloat? = nil) {
+        self.minDragDistance = minDragDistance
+        self.explicitHeight = explicitHeight
+        self.explicitWidth = explicitWidth
+        
+    }
+    
+}
+
 /// A stack view providing shuffling behaviour to shuffle to left and right like a deck of cards.
 ///
 /// ## Overview
@@ -72,6 +92,10 @@ public struct ShuffleDeck<Data: RandomAccessCollection, Content: View>: View {
     @State internal var index: Data.Index
     @State internal var xPosition: CGFloat = .zero
     @State internal var size: CGSize = .zero
+    internal var resolvedSize: CGSize {
+        CGSize(width: conf.explicitWidth ?? size.width, height: conf.explicitHeight ?? size.height)
+    }
+
     @State internal var direction: ShuffleDeckDirection = .left
     @State internal var autoShuffling: Bool = false
 
@@ -83,6 +107,10 @@ public struct ShuffleDeck<Data: RandomAccessCollection, Content: View>: View {
 
     @GestureState internal var isActiveGesture: Bool = false
 
+    //SYMBIOSE
+    @State var conf: ShuffleDeckConfig
+    
+    
     internal let data: Data
     internal let content: (Data.Element, CGFloat) -> Content
 
@@ -91,6 +119,8 @@ public struct ShuffleDeck<Data: RandomAccessCollection, Content: View>: View {
     #endif
 
     public var body: some View {
+//        let _ = Self._printChanges()
+        
         ZStack {
             // MARK: - Next Contents
             nextContent
@@ -109,17 +139,23 @@ public struct ShuffleDeck<Data: RandomAccessCollection, Content: View>: View {
                 .background {
                     GeometryReader { proxy in
                         Color.clear
-                            .preference(key: SizePreferenceKey.self, value: proxy.size)
+                            .preference(key: DeckSizePreferenceKey.self, value: proxy.size)
                     }
                 }
         }
         .frame(maxWidth: .infinity, minHeight: size.height)
-        .onPreferenceChange(SizePreferenceKey.self) { size in
+        .onPreferenceChange(DeckSizePreferenceKey.self) { size in
+            ShuffleItDebugger.shared.dprint("[ShuffleDeck] onPreferenceChange SizePreferenceKey \(size)")
+//            self.size = size
             DispatchQueue.main.async {
-                self.size = size
+                if size != .zero {
+                    self.size = size
+                }
             }
         }
         .onChange(of: isActiveGesture) { value in
+            ShuffleItDebugger.shared.dprint("[ShuffleDeck] onChange of isActiveGesture: \(value)")
+
             if !isActiveGesture {
                 performRestoring()
             }
@@ -141,13 +177,17 @@ public struct ShuffleDeck<Data: RandomAccessCollection, Content: View>: View {
             }
         }
         .disabled(autoShuffling)
-        .onChange(of: xPosition) { _ in
-            DispatchQueue.main.async {
-                shuffleDeckTranslation?(translation)
-            }
+        .onChange(of: xPosition) { newPos in
+            ShuffleItDebugger.shared.dprint("[ShuffleDeck] onChange of xPosition: \(newPos)")
+            shuffleDeckTranslation?(translation)
+
+//            DispatchQueue.main.async {
+//                shuffleDeckTranslation?(translation)
+//            }
         }
         #if canImport(ViewInspector)
         .onReceive(inspection.notice) {
+            ShuffleItDebugger.shared.dprint("[ShuffleDeck] onReceive inspection.notice")
             self.inspection.visit(self, $0)
         }
         #endif
@@ -162,7 +202,9 @@ public struct ShuffleDeck<Data: RandomAccessCollection, Content: View>: View {
             mainContent
         } else {
             mainContent
-                .gesture(dragGesture)
+                .simultaneousGesture(dragGesture)
+//                .highPriorityGesture(dragGesture)
+//                .gesture(dragGesture)
         }
         #endif
     }
@@ -177,13 +219,16 @@ extension ShuffleDeck {
     public init(
         _ data: Data,
         initialIndex: Data.Index? = nil,
+        conf: ShuffleDeckConfig? = nil,
         @ViewBuilder content: @escaping (Data.Element) -> Content
     ) {
         self.data = data
         self._index = State(initialValue: initialIndex ?? data.startIndex)
+        self._conf = State(initialValue: conf ?? .init())
         self.content = { element, _ in
             content(element)
         }
+        ShuffleItDebugger.shared.dprint("[ShuffleDeck] init data.count: \(data.count)")
     }
 
     /// An initializer that returns an instance of `ShuffleDeck` and exposes translation value to child content through view builder.
@@ -194,10 +239,18 @@ extension ShuffleDeck {
     public init(
         _ data: Data,
         initialIndex: Data.Index? = nil,
+        conf: ShuffleDeckConfig? = nil,
         content: @escaping (Data.Element, CGFloat) -> Content
     ) {
         self.data = data
         self._index = State(initialValue: initialIndex ?? data.startIndex)
+        self._conf = State(initialValue: conf ?? .init())
+
         self.content = content
+        ShuffleItDebugger.shared.dprint("[ShuffleDeck] init data.count: \(data.count)")
+
     }
+    
+    
+    
 }

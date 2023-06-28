@@ -1,7 +1,7 @@
 import SwiftUI
 
 /// A perference key to reveal the size of child view.
-public struct SizePreferenceKey: PreferenceKey {
+public struct DeckSizePreferenceKey: PreferenceKey {
     public typealias Value = CGSize
 
     public static var defaultValue: Value = .zero

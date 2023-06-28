@@ -95,7 +95,7 @@ public struct CarouselStack<Data: RandomAccessCollection, Content: View>: View {
                 .background {
                     GeometryReader { proxy in
                         Color.clear
-                            .preference(key: SizePreferenceKey.self, value: proxy.size)
+                            .preference(key: DeckSizePreferenceKey.self, value: proxy.size)
                     }
                 }
             rightContent
@@ -104,7 +104,7 @@ public struct CarouselStack<Data: RandomAccessCollection, Content: View>: View {
         .frame(maxWidth: .infinity)
         .padding(.horizontal, padding)
         .frame(minHeight: size.height)
-        .onPreferenceChange(SizePreferenceKey.self) { size in
+        .onPreferenceChange(DeckSizePreferenceKey.self) { size in
             DispatchQueue.main.async {
                 self.size = size
             }

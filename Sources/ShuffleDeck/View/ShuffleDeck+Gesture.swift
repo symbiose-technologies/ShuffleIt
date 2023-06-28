@@ -5,12 +5,14 @@ extension ShuffleDeck {
     @available(iOS 15.0, macOS 12.0, watchOS 8.0, *)
     @available(tvOS, unavailable)
     internal var dragGesture: some Gesture {
-        DragGesture()
+        DragGesture(minimumDistance: self.conf.minDragDistance ?? 0)
             .updating($isActiveGesture) { _, state, _ in
+                ShuffleItDebugger.shared.dprint("[ShuffleDeck] updating $isActiveGesture \(state)")
                 state = true
             }
             .onChanged { value in
                 var position: CGFloat
+                ShuffleItDebugger.shared.dprint("[ShuffleDeck] onChanged value.translation \(value.translation) currentSize: \(size)")
                 switch style {
                 case .infiniteShuffle:
                     position = value.translation.width / 1.2
@@ -23,13 +25,15 @@ extension ShuffleDeck {
                         position /= 15
                     }
                 }
-                let range = size.width * 0.5
+//                let range = size.width * 0.5
+                let range = resolvedSize.width * 0.5
                 xPosition = min(max(position, -range), range)
                 if xPosition > 0 {
                     direction = .left
                 } else if xPosition < 0 {
                     direction = .right
                 }
+                ShuffleItDebugger.shared.dprint("[ShuffleDeck] onChanged xPosition: \(xPosition) rawPosition: \(position) style: \(style) direction: \(direction)")
             }
     }
 }

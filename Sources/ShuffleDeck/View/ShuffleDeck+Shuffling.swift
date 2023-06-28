@@ -27,8 +27,8 @@ extension ShuffleDeck {
 
     /// A method that performs to restore content views, which have already spread out in the process of shuffling, to the original position.
     internal func performRestoring() {
-        let midX = size.width * 0.5
-        let maxSwipeDistance = size.width * 0.25
+        let midX = resolvedSize.width * 0.5
+        let maxSwipeDistance = resolvedSize.width * 0.25
         if xPosition > 0 {
             let newIndex: Data.Index?
             switch style {
@@ -121,11 +121,11 @@ extension ShuffleDeck {
 
     /// A property that calculates translation value of dragging content views.
     internal var translation: CGFloat {
-        return size.width > 0 ? min(abs(xPosition) / (size.width * 0.5), 1) : 0
+        return resolvedSize.width > 0 ? min(abs(xPosition) / (resolvedSize.width * 0.5), 1) : 0
     }
 
     /// A property that calculates drag amount of the content view.
     internal var factor: CGFloat {
-        return size.width > 0 ? xPosition / (size.width * 0.5) : 0
+        return resolvedSize.width > 0 ? xPosition / (resolvedSize.width * 0.5) : 0
     }
 }

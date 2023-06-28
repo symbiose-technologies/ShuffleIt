@@ -97,14 +97,14 @@ public struct ShuffleStack<Data: RandomAccessCollection, StackContent: View>: Vi
                 .background {
                     GeometryReader { proxy in
                         Color.clear
-                            .preference(key: SizePreferenceKey.self, value: proxy.size)
+                            .preference(key: DeckSizePreferenceKey.self, value: proxy.size)
                     }
                 }
         }
         .frame(maxWidth: .infinity)
         .padding(.horizontal, padding + offset)
         .frame(minHeight: size.height)
-        .onPreferenceChange(SizePreferenceKey.self) { size in
+        .onPreferenceChange(DeckSizePreferenceKey.self) { size in
             DispatchQueue.main.async {
                 self.size = size
             }

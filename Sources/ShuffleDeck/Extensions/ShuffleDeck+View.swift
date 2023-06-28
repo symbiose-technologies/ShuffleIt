@@ -1,6 +1,18 @@
 import SwiftUI
 import Combine
 
+/// Symbiose Modifications
+public extension ShuffleDeck {
+    
+    func shuffleDeckMinimumDragDistance(_ minDistance: CGFloat?) -> ShuffleDeck {
+        var deck = self
+        deck.conf.minDragDistance = minDistance
+        return deck
+    }
+    
+}
+
+
 public extension View {
     /// A modifier that overrides default shuffle animation of the shuffle deck view.
     ///

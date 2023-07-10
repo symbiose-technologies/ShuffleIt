@@ -143,7 +143,7 @@ public struct ShuffleDeck<Data: RandomAccessCollection, Content: View>: View {
                     }
                 }
         }
-        .frame(maxWidth: .infinity, minHeight: size.height)
+//        .frame(maxWidth: .infinity, minHeight: size.height)
         .onPreferenceChange(DeckSizePreferenceKey.self) { size in
             ShuffleItDebugger.shared.dprint("[ShuffleDeck] onPreferenceChange SizePreferenceKey \(size)")
 //            self.size = size

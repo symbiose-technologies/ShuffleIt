@@ -14,7 +14,7 @@ extension CarouselStack {
                 if translation > 0 {
                     switch style {
                     case .infiniteScroll:
-                        xPosition = translation - (data.distance(from: data.startIndex, to: data.endIndex) == 1 ? translation * 0.7 : 0)
+                        xPosition = translation - (data.distance(from: data.startIndex, to: data.endIndex) == 1 ? translation * 0.6 : 0)
                     case .finiteScroll:
                         xPosition = translation - (index == data.startIndex ? translation * 0.7 : 0)
                     }
@@ -22,7 +22,7 @@ extension CarouselStack {
                 } else if translation < 0 {
                     switch style {
                     case .infiniteScroll:
-                        xPosition = translation - (data.distance(from: data.startIndex, to: data.endIndex) == 1 ? translation * 0.7 : 0)
+                        xPosition = translation - (data.distance(from: data.startIndex, to: data.endIndex) == 1 ? translation * 0.6 : 0)
                     case .finiteScroll:
                         xPosition = translation - (index == data.index(before: data.endIndex) ? translation * 0.7 : 0)
                     }

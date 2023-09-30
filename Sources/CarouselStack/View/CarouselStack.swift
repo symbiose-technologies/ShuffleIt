@@ -104,6 +104,8 @@ public struct CarouselStack<Data: RandomAccessCollection, Content: View>: View {
         .frame(maxWidth: .infinity)
         .padding(.horizontal, padding)
         .frame(minHeight: size.height)
+//        .clipped()
+        
         .onPreferenceChange(DeckSizePreferenceKey.self) { size in
             DispatchQueue.main.async {
                 self.size = size
@@ -153,7 +155,10 @@ public struct CarouselStack<Data: RandomAccessCollection, Content: View>: View {
         if disabled {
             mainContent
         } else {
-            mainContent.gesture(dragGesture)
+            mainContent
+                .highPriorityGesture(dragGesture, including: .all)
+            
+//            mainContent.gesture(dragGesture)
         }
         #endif
     }
